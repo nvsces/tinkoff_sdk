@@ -2,14 +2,14 @@ group 'tech.pmobi.tinkoff_sdk'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ext.kotlin_version = '1.7.10'
+    ext.kotlin_version = '1.9.22'
     repositories {
         google()
         jcenter()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.0'
+        classpath 'com.android.tools.build:gradle:8.1.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -26,7 +26,7 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 33
 
     defaultConfig {
         minSdkVersion 19
@@ -38,6 +38,7 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
+        namespace "tech.pmobi.tinkoff_sdk"
     }
 }
 
