@@ -1,21 +1,3 @@
-/*
-
-  Copyright © 2020 ProgressiveMobile
-
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-
-  http://www.apache.org/licenses/LICENSE-2.0
-
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
-
-*/
-
 package tech.pmobi.tinkoff_sdk;
 
 import android.app.Activity;
@@ -97,10 +79,10 @@ public class TinkoffSdkPlugin implements MethodCallHandler, FlutterPlugin, Activ
         @Override
         public void onUiNeeded(@NotNull AsdkState asdkState) {
             tinkoffAcquiring.openPaymentScreen(
-                (FragmentActivity) activity,
-                shadowPaymentOptions,
-                PAYMENT_REQUEST_CODE,
-                asdkState
+                    (FragmentActivity) activity,
+                    shadowPaymentOptions,
+                    PAYMENT_REQUEST_CODE,
+                    asdkState
             );
         }
 
@@ -125,7 +107,6 @@ public class TinkoffSdkPlugin implements MethodCallHandler, FlutterPlugin, Activ
         @Override
         public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
             if (result != null) {
-
                 if (requestCode == PAYMENT_REQUEST_CODE) {
                     result.success(createResult(resultCode, data).toString());
                     shadowPaymentOptions = null;
@@ -152,7 +133,7 @@ public class TinkoffSdkPlugin implements MethodCallHandler, FlutterPlugin, Activ
         if (data != null && !success) {
             final Bundle bundle = data.getExtras();
             final AcquiringApiException exception = (AcquiringApiException) bundle.get(TinkoffAcquiring.EXTRA_ERROR);
-                message = exception != null
+            message = exception != null
                     ? exception.getLocalizedMessage()
                     : "Неизвестная ошибка";
         } else {
@@ -182,9 +163,9 @@ public class TinkoffSdkPlugin implements MethodCallHandler, FlutterPlugin, Activ
         if (this.result != null) return;
         if (!(activity instanceof FragmentActivity)) {
             result.error(
-            "no_fragment_activity",
-            "plugin requires activity to be a FragmentActivity.",
-            null);
+                    "no_fragment_activity",
+                    "plugin requires activity to be a FragmentActivity.",
+                    null);
             return;
         }
 
@@ -240,7 +221,7 @@ public class TinkoffSdkPlugin implements MethodCallHandler, FlutterPlugin, Activ
             parser = new TinkoffSdkParser(language);
             tinkoffAcquiring = new TinkoffAcquiring(terminalKey, publicKey);
             sdk = new AcquiringSdk(terminalKey, publicKey);
-                sdk.init(initRequest -> Unit.INSTANCE);
+            sdk.init(initRequest -> Unit.INSTANCE);
 
             if (nativePay) {
                 setupGooglePlay(terminalKey);
@@ -255,23 +236,23 @@ public class TinkoffSdkPlugin implements MethodCallHandler, FlutterPlugin, Activ
 
     private void setupGooglePlay(@NonNull String terminalKey) {
         final GooglePayParams googleParams = new GooglePayParams(
-            terminalKey,
-            false,
-            false,
-            AcquiringSdk.AsdkLogger.isDebug()
-                ? WalletConstants.ENVIRONMENT_TEST
-                : WalletConstants.ENVIRONMENT_PRODUCTION
+                terminalKey,
+                false,
+                false,
+                AcquiringSdk.AsdkLogger.isDebug()
+                        ? WalletConstants.ENVIRONMENT_TEST
+                        : WalletConstants.ENVIRONMENT_PRODUCTION
         );
 
         googlePayHelper = new GooglePayHelper(googleParams);
 
         Context context = activity.getApplicationContext();
         googlePayHelper.initGooglePay(
-            context,
-            isReady -> {
-                isGooglePayEnabled = isReady;
-                return Unit.INSTANCE;
-            }
+                context,
+                isReady -> {
+                    isGooglePayEnabled = isReady;
+                    return Unit.INSTANCE;
+                }
         );
     }
 
@@ -288,38 +269,38 @@ public class TinkoffSdkPlugin implements MethodCallHandler, FlutterPlugin, Activ
 
             Thread thread = new Thread(() -> {
                 request.execute(
-                    response -> {
-                        activity.runOnUiThread(() -> {
-                            final Card[] cards = response.getCards();
-                            final ArrayList<String> cardsList = new ArrayList();
+                        response -> {
+                            activity.runOnUiThread(() -> {
+                                final Card[] cards = response.getCards();
+                                final ArrayList<String> cardsList = new ArrayList();
 
-                            for (final Card card : cards) {
-                                if (card.getStatus() == CardStatus.ACTIVE) {
-                                    JSONObject json = new JSONObject();
-                                    try {
-                                        json.put("cardId", card.getCardId());
-                                        json.put("pan", card.getPan());
-                                        json.put("expDate", card.getExpDate());
-                                        cardsList.add(json.toString());
-                                    } catch (JSONException ex) {
-                                        ex.printStackTrace();
+                                for (final Card card : cards) {
+                                    if (card.getStatus() == CardStatus.ACTIVE) {
+                                        JSONObject json = new JSONObject();
+                                        try {
+                                            json.put("cardId", card.getCardId());
+                                            json.put("pan", card.getPan());
+                                            json.put("expDate", card.getExpDate());
+                                            cardsList.add(json.toString());
+                                        } catch (JSONException ex) {
+                                            ex.printStackTrace();
+                                        }
                                     }
                                 }
-                            }
 
-                            result.success(cardsList);
-                            result = null;
-                        });
-                        return Unit.INSTANCE;
-                    },
-                    e -> {
-                        activity.runOnUiThread(() -> {
-                            result.success(new ArrayList());
-                            result = null;
-                        });
+                                result.success(cardsList);
+                                result = null;
+                            });
+                            return Unit.INSTANCE;
+                        },
+                        e -> {
+                            activity.runOnUiThread(() -> {
+                                result.success(new ArrayList());
+                                result = null;
+                            });
 
-                        return Unit.INSTANCE;
-                    }
+                            return Unit.INSTANCE;
+                        }
                 );
             });
             thread.start();
@@ -338,16 +319,14 @@ public class TinkoffSdkPlugin implements MethodCallHandler, FlutterPlugin, Activ
             final PaymentOptions paymentOptions = parser.createPaymentOptions(arguments);
 
             tinkoffAcquiring.openPaymentScreen(
-                (FragmentActivity) activity,
-                paymentOptions,
-                PAYMENT_REQUEST_CODE,
-                DefaultState.INSTANCE
+                    (FragmentActivity) activity,
+                    paymentOptions,
+                    PAYMENT_REQUEST_CODE,
+                    DefaultState.INSTANCE
             );
 
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage(), e);
-            result.error("Error opening payment screen", e.getMessage(), null);
-            result = null;
+            result.error("error", e.getMessage(), null);
         }
     }
 
@@ -355,16 +334,120 @@ public class TinkoffSdkPlugin implements MethodCallHandler, FlutterPlugin, Activ
         try {
             @SuppressWarnings("unchecked")
             final Map<String, Object> arguments = (Map<String, Object>) call.arguments;
-            final SavedCardsOptions options = parser.createSavedCardOptions(arguments);
+            final String customerKey = (String) arguments.get("customerKey");
+            final String cardId = (String) arguments.get("cardId");
+            final boolean isOnlyAttach = (Boolean) arguments.get("isOnlyAttach");
 
-            tinkoffAcquiring.openSavedCardsScreen(
-                (FragmentActivity) activity,
-                options,
-                ATTACH_CARD_REQUEST_CODE
+            tinkoffAcquiring.openAttachCardScreen(
+                    (FragmentActivity) activity,
+                    customerKey,
+                    cardId,
+                    isOnlyAttach,
+                    ATTACH_CARD_REQUEST_CODE
+            );
+
+        } catch (Exception e) {
+            result.error("error", e.getMessage(), null);
+        }
+    }
+
+    private void handleShowQrScreen(MethodCall call) {
+        try {
+            @SuppressWarnings("unchecked")
+            final Map<String, Object> arguments = (Map<String, Object>) call.arguments;
+
+            final String qrCode = (String) arguments.get("qrCode");
+            final String token = (String) arguments.get("token");
+            final String style = (String) arguments.get("style");
+
+            tinkoffAcquiring.openQrScreen(
+                    (FragmentActivity) activity,
+                    qrCode,
+                    token,
+                    style,
+                    QR_REQUEST_CODE
             );
         } catch (Exception e) {
-            result.error("Error opening AttachCardScreen", e.getMessage(), null);
-            result = null;
+            result.error("error", e.getMessage(), null);
+        }
+    }
+
+    private void handleOpenNativePayment(MethodCall call) {
+        try {
+            @SuppressWarnings("unchecked")
+            final Map<String, Object> arguments = (Map<String, Object>) call.arguments;
+
+            final String customerKey = (String) arguments.get("customerKey");
+
+            sdk.startPayment(
+                    customerKey,
+                    new PaymentListener() {
+                        @Override
+                        public void onError(Throwable throwable) {
+                            result.error("error", throwable.getMessage(), null);
+                        }
+
+                        @Override
+                        public void onStatusChanged(PaymentState state) {
+                            Log.i(TAG, "Payment state: " + state);
+                        }
+
+                        @Override
+                        public void onSuccess(long amount, String paymentToken, String rawResponse) {
+                            result.success(createResult(-1, null).toString());
+                        }
+
+                        @Override
+                        public void onUiNeeded(AsdkState asdkState) {
+                            tinkoffAcquiring.openPaymentScreen(
+                                    (FragmentActivity) activity,
+                                    shadowPaymentOptions,
+                                    PAYMENT_REQUEST_CODE,
+                                    asdkState
+                            );
+                        }
+                    }
+            );
+        } catch (Exception e) {
+            result.error("error", e.getMessage(), null);
+        }
+    }
+
+    private void handleStartCharge(MethodCall call) {
+        try {
+            @SuppressWarnings("unchecked")
+            final Map<String, Object> arguments = (Map<String, Object>) call.arguments;
+
+            final long amount = (Long) arguments.get("amount");
+            final String customerKey = (String) arguments.get("customerKey");
+
+            sdk.startPayment(
+                    amount,
+                    customerKey,
+                    new PaymentListener() {
+                        @Override
+                        public void onSuccess(long amount, String paymentToken, String rawResponse) {
+                            result.success(createResult(-1, null).toString());
+                        }
+
+                        @Override
+                        public void onUiNeeded(AsdkState asdkState) {
+                            tinkoffAcquiring.openPaymentScreen(
+                                    (FragmentActivity) activity,
+                                    shadowPaymentOptions,
+                                    PAYMENT_REQUEST_CODE,
+                                    asdkState
+                            );
+                        }
+
+                        @Override
+                        public void onError(Throwable throwable) {
+                            result.error("error", throwable.getMessage(), null);
+                        }
+                    }
+            );
+        } catch (Exception e) {
+            result.error("error", e.getMessage(), null);
         }
     }
 
@@ -373,81 +456,29 @@ public class TinkoffSdkPlugin implements MethodCallHandler, FlutterPlugin, Activ
         result = null;
     }
 
-    private void handleShowQrScreen(MethodCall call) {
-        //TODO: implement method
-        result.notImplemented();
-    }
-
-    private void handleOpenNativePayment(MethodCall call) {
-        if (isGooglePayEnabled) {
-            @SuppressWarnings("unchecked")
-            final Map<String, Object> arguments = (Map<String, Object>) call.arguments;
-            shadowPaymentOptions = parser.createPaymentOptions(arguments);
-
-            googlePayHelper.openGooglePay(
-                activity,
-                shadowPaymentOptions.getOrder().getAmount(),
-                GOOGLE_PAY_REQUEST_CODE
-            );
-        } else {
-            result.error("GooglePay is not available", "", null);
-            result = null;
-        }
-    }
-
-    private void handleGooglePayResult(int resultCode, Intent data) {
-        if (data != null && resultCode == -1) {
-            final String token = GooglePayHelper.getGooglePayToken(data);
-
-            tinkoffAcquiring.initPayment(token, shadowPaymentOptions)
-                .subscribe(paymentListener)
-                .start();
-        } else {
-            result.success(createResult(resultCode, data).toString());
-            result = null;
-        }
-    }
-
-    private void handleStartCharge(MethodCall call) {
-        //TODO: implement method
-        result.notImplemented();
+    @Override
+    public void onAttachedToEngine(@NonNull Context context, @NonNull BinaryMessenger messenger) {
+        methodChannel = new MethodChannel(messenger, "tinkoff_sdk");
+        methodChannel.setMethodCallHandler(this);
     }
 
     @Override
-    public void onAttachedToActivity(ActivityPluginBinding binding) {
-        activity = binding.getActivity();
-        binding.addActivityResultListener(activityResultListener);
-        methodChannel.setMethodCallHandler(this);
+    public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
+        this.activity = binding.getActivity();
     }
 
     @Override
     public void onDetachedFromActivityForConfigChanges() {
-        activity = null;
+        // No implementation needed
     }
 
     @Override
-    public void onReattachedToActivityForConfigChanges(ActivityPluginBinding binding) {
-        activity = binding.getActivity();
+    public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
+        this.activity = binding.getActivity();
     }
 
     @Override
     public void onDetachedFromActivity() {
-        activity = null;
-    }
-
-    @Override
-    public void onAttachedToEngine(@NonNull FlutterPluginBinding binding) {
-        onAttachedToEngine(binding.getApplicationContext(), binding.getBinaryMessenger());
-    }
-
-    private void onAttachedToEngine(Context applicationContext, BinaryMessenger messenger) {
-        methodChannel = new MethodChannel(messenger, TAG);
-        methodChannel.setMethodCallHandler(this);
-    }
-
-    @Override
-    public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
-        methodChannel.setMethodCallHandler(null);
-        methodChannel = null;
+        this.activity = null;
     }
 }
